@@ -1,5 +1,9 @@
 package com.blumDesign.bankOfMom.api.data;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+
 public class SpendingLimit {
 
 	private String description;
@@ -55,4 +59,46 @@ public class SpendingLimit {
 		this.velocityType = velocityType;
 	}
 	
+	public void getFromDb(int index, DBCollection coll) {
+		BasicDBObject query = new BasicDBObject("_id", index);
+		DBCursor cursor = coll.find(query);
+		try {
+			BasicDBObject object = (BasicDBObject) cursor.next();
+			if (object.containsField("description")) {
+				description = object.get("description").toString();
+			}
+			if (object.containsField("type")) {
+				type = object.getString("type");
+			}
+			if (object.containsField("amount")) {
+				amount = object.getDouble("amount");
+			}
+			if (object.containsField("velocityType")) {
+				velocityType = object.getString("velocityType");
+			}
+
+		} catch (Exception e) {
+			cursor.close();
+			System.err.println(e);
+		}
+		
+	}
+	
+	public void insetIntoDb(DBCollection coll) {
+		BasicDBObject obj = getDBObject();
+		coll.insert(obj);
+	}
+	
+	public BasicDBObject getDBObject() {
+		BasicDBObject obj = new BasicDBObject("amount", Double.valueOf(amount))
+				.append("description", description)
+				.append("type", type)
+				.append(velocityType, velocityType);
+		return obj;
+	}
+
+	public void removeDb(DBCollection coll) {
+		BasicDBObject query = new BasicDBObject("description", description);
+		coll.remove(query);
+	}
 }

@@ -2,6 +2,10 @@ package com.blumDesign.bankOfMom.api.data;
 
 import java.util.ArrayList;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+
 public class Mom {
 
 	private String name;
@@ -57,4 +61,38 @@ public class Mom {
 		this.kids = kids;
 	}
 	
+	public void getFromDb(int index, DBCollection coll) {
+		BasicDBObject query = new BasicDBObject("_id", index);
+		DBCursor cursor = coll.find(query);
+		try {
+			BasicDBObject object = (BasicDBObject) cursor.next();
+			if (object.containsField("name")) {
+				name = object.get("name").toString();
+			}
+			if (object.containsField("balance")) {
+				balance = object.getDouble("balance");
+			}
+
+		} catch (Exception e) {
+			cursor.close();
+			System.err.println(e);
+		}
+		
+	}
+	
+	public void insetIntoDb(DBCollection coll) {
+		BasicDBObject obj = getDBObject();
+		coll.insert(obj);
+	}
+	
+	public BasicDBObject getDBObject() {
+		BasicDBObject obj = new BasicDBObject("balance", Double.valueOf(balance))
+				.append("name", name);
+		return obj;
+	}
+
+	public void removeDb(DBCollection coll) {
+		BasicDBObject query = new BasicDBObject("name", name);
+		coll.remove(query);
+	}
 }

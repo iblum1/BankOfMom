@@ -2,8 +2,12 @@ package com.blumDesign.bankOfMom.api.data;
 
 import java.util.ArrayList;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+
 public class Account {
 
+	private String accountNumber;
 	private double balance;
 	private ArrayList<Transaction> transactions;
 	private ArrayList<SpendingLimit> spendingLimits;
@@ -44,4 +48,30 @@ public class Account {
 		this.spendingLimits = spendingLimits;
 	}
 	
+	
+	/**
+	 * @return the accountNumber
+	 */
+	public String getAccountNumber() {
+		return accountNumber;
+	}
+	/**
+	 * @param accountNumber the accountNumber to set
+	 */
+	public void setAccountNumber(String accountNumber) {
+		this.accountNumber = accountNumber;
+	}
+	public void insetIntoDb(DBCollection coll) {
+		BasicDBObject obj = getDBObject();
+		coll.insert(obj);
+	}
+	
+	public BasicDBObject getDBObject() {
+		BasicDBObject obj = new BasicDBObject("balance", Double.valueOf(balance))
+				.append("accountNumber", accountNumber);
+		return obj;
+	}
+	
+
+
 }

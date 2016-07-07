@@ -2,6 +2,9 @@ package com.blumDesign.bankOfMom.api.data;
 
 import java.util.Date;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+
 public class Transaction {
 
 	private Date transactionDate;
@@ -83,4 +86,21 @@ public class Transaction {
 		this.description = description;
 	}
 	
+	public void insetIntoDb(DBCollection coll) {
+		BasicDBObject obj = getDBObject();
+		coll.insert(obj);
+	}
+	
+	public BasicDBObject getDBObject() {
+		BasicDBObject obj = new BasicDBObject("amount", Double.valueOf(amount))
+				.append("transactionDate", transactionDate)
+				.append("type", type)
+				.append("description", description);
+		return obj;
+	}
+
+	public void removeDb(DBCollection coll) {
+		BasicDBObject query = new BasicDBObject("description", description);
+		coll.remove(query);
+	}
 }
